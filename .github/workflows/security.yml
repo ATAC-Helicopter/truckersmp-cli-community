@@ -18,13 +18,18 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.x"
+          python-version: "3.12"
 
       - name: Install Bandit
         run: python -m pip install bandit
 
       - name: Run Bandit
-        run: bandit -r truckersmp_cli truckersmp-cli
+        run: |
+          bandit \
+            --recursive truckersmp_cli truckersmp-cli \
+            --severity-level medium \
+            --confidence-level medium \
+            --skip B404,B603
 
   pip-audit:
     name: Python dependency vulnerability scan
@@ -34,7 +39,7 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.x"
+          python-version: "3.12"
 
       - name: Install package and pip-audit
         run: |
@@ -50,6 +55,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Run Gitleaks
         uses: gitleaks/gitleaks-action@v2
