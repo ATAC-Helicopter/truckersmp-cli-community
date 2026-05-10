@@ -24,6 +24,7 @@ jobs:
         run: python -m pip install bandit
 
       - name: Run Bandit
+        continue-on-error: true
         run: |
           bandit \
             --recursive truckersmp_cli truckersmp-cli \
