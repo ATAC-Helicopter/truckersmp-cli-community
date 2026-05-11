@@ -32,12 +32,12 @@ def _check_path(check_id, label, path, mode=os.R_OK, category="general"):
 
 
 def _steam_install_candidates():
-    """Return known native, Flatpak, and Snap Steam installation candidates."""
+    """Return known native, Flatpak, Snap, and custom Steam candidates."""
     home = os.path.expanduser("~")
     candidates = []
 
     if Args.native_steam_dir != "auto":
-        candidates.append(("configured", os.path.expanduser(Args.native_steam_dir)))
+        candidates.append(("custom", os.path.expanduser(Args.native_steam_dir)))
 
     candidates.extend((
         ("native", os.path.join(Dir.XDG_DATA_HOME, "Steam")),
@@ -71,7 +71,7 @@ def _steam_has_config_files(path):
 
 
 def _detect_steam_installation():
-    """Detect the most likely Steam installation directory and install type."""
+    """Detect the most likely Steam installation directory and package/source."""
     for install_type, path in _steam_install_candidates():
         if os.path.isdir(path) and _steam_has_config_files(path):
             return install_type, path
@@ -84,7 +84,7 @@ def _detect_steam_installation():
 
 
 def _is_steam_running():
-    """Check whether the native Steam process appears to be running."""
+    """Check whether the Steam process appears to be running."""
     if platform.system() != "Linux":
         return False, "Steam process check is only supported on Linux"
 
@@ -135,16 +135,16 @@ def _build_steam_checks():
 
     checks = [
         _make_check(
-            "steam_install_type",
+            "steam_install_source",
             install_type != "unknown",
-            "Steam install type",
+            "Steam package/source",
             install_type,
             "steam",
         ),
         _make_check(
-            "native_steam_directory",
+            "steam_directory",
             install_type != "unknown",
-            "Native Steam directory detected",
+            "Steam directory detected",
             steamdir,
             "steam",
         ),
@@ -282,9 +282,9 @@ def _build_report(version_string):
         "data_directory": Dir.truckersmp_cli_data,
         "runner": "proton" if Args.proton else "wine",
         "steam": {
-            "install_type": steam_install_type,
+            "source": steam_install_type,
             "directory": steam_directory,
-            "native_steam_dir_option": Args.native_steam_dir,
+            "configured_steam_directory": Args.native_steam_dir,
         },
         "proton": {
             "appid": Args.proton_appid if Args.proton else None,
