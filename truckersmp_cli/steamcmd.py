@@ -176,7 +176,9 @@ class SteamCMD:
     def _run_interactive(self, cmdline):
         """Run SteamCMD interactively with PTY for immediate I/O."""
         if pty is None:
-            sys.exit("SteamCMD interactive PTY support is not available on this platform.")
+            sys.exit(
+                "SteamCMD interactive PTY support is not available on this platform."
+            )
 
         def master_read(fd):
             data = os.read(fd, 1024)
