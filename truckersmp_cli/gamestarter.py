@@ -12,6 +12,7 @@ import sys
 import tempfile
 import time
 
+from .proton_diagnostics import log_proton_diagnostics
 from .utils import (
     activate_native_d3dcompiler_47, find_discord_ipc_sockets, get_proton_dist_dir,
     get_proton_version, get_steam_library_dirs, is_d3dcompiler_setup_skippable,
@@ -313,15 +314,22 @@ class StarterProton(GameStarterInterface):
             + ["--", ] + self._args["proton"]
         logging.debug("Helper arguments: %s", helper_args)
         try:
+            output_lines = []
             with subproc.Popen(
                     helper_args,
                     env=self._env, stdout=subproc.PIPE, stderr=subproc.STDOUT) as proc:
-                if Args.verbose:
-                    print_child_output(proc)
+                for line in proc.stdout:
+                    try:
+                        decoded_line = line.decode("utf-8")
+                    except UnicodeDecodeError:
+                        decoded_line = f"!! NON UNICODE OUTPUT !!  {line!r}"
+                    output_lines.append(decoded_line)
+                    if Args.verbose:
+                        print(decoded_line, end="", flush=True)
                 proc.wait()
-        except subproc.CalledProcessError as ex:
-            logging.error(
-                "Steam Runtime helper exited abnormally:\n%s", ex.output.decode("utf-8"))
+            log_proton_diagnostics("".join(output_lines))
+        except OSError as ex:
+            logging.error("Failed to run Steam Runtime helper: %s", ex)
 
         # disable Wine desktop if enabled
         if Args.wine_desktop:
