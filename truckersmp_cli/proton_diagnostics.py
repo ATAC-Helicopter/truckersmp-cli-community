@@ -53,7 +53,10 @@ _PROTON_OUTPUT_PATTERNS = (
         "patterns": (
             "AttributeError: 'str' object has no attribute 'removesuffix'",
         ),
-        "summary": "GE-Proton appears to be running with a Python version that is too old.",
+        "summary": (
+            "GE-Proton appears to be running with a Python version that is "
+            "too old."
+        ),
         "suggestion": (
             "GE-Proton 10 uses Python features that require Python 3.9 or newer. "
             "Use a newer host Python, a different Proton build, or run with a "
